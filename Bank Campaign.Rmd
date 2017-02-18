@@ -1,0 +1,79 @@
+---
+title: "Bank Campaign"
+author: "Akhil Gaur"
+date: "18 February 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Read the data `Banking Campaign.csv`
+
+```{r}
+Bank.Campaign <- read.csv("Bank Campaign.csv", na.strings="")
+View(Bank.Campaign)
+```
+
+#Sampling frequency of the file
+
+```{r}
+summary(Bank.Campaign)
+```
+
+
+#No. of rows and columns
+
+
+```{r}
+nrow(Bank.Campaign)
+ncol(Bank.Campaign)
+```
+
+#Detect the types of the columns (Dimensions, Metrics, Dates, Text and Geo)
+
+```{r}
+dim(Bank.Campaign)
+str(Bank.Campaign)
+```
+
+
+#Detect number of non-null values in each columns
+
+```{r}
+#for missing values
+library(Rcpp)
+library(VIM)
+library(mice)
+md.pattern(Bank.Campaign)
+#no. of non-null values in each columns
+colSums(Bank.Campaign != "null")
+```
+
+#Create a bar chart using ggplot or simple base r plot to represent frequency distribution of each dimension column. Describe your findings.
+
+```{r}
+library(ggplot2)
+ggplot(Bank.Campaign,aes(x=Age.Group,fill=Bank.Campaign$Age.Group))+geom_bar()+labs(x="r",y="t")+ggtitle("maintitle=m")
+```
+```{r}
+ggplot(Bank.Campaign,aes(x=Job,fill=Bank.Campaign$Job))+geom_bar()+labs(x="r",y="t")+ggtitle("maintitle=m")
+```
+```{r}
+ggplot(Bank.Campaign,aes(x=Marital,fill=Bank.Campaign$Marital))+geom_bar()+labs(x="r",y="t")+ggtitle("maintitle=m")
+```
+```{r}
+ggplot(Bank.Campaign,aes(x=Education,fill=Bank.Campaign$Education))+geom_bar()+labs(x="r",y="t")+ggtitle("maintitle=m")
+```
+```{r}
+ggplot(Bank.Campaign,aes(x=Default,fill=Bank.Campaign$Default))+geom_bar()+labs(x="r",y="t")+ggtitle("maintitle=m")
+```
+```{r}
+ggplot(Bank.Campaign,aes(x=Balance.Group,fill=Bank.Campaign$Balance.Group))+geom_bar()+labs(x="r",y="t")+ggtitle("maintitle=m")
+```
+```{r}
+ggplot(Bank.Campaign,aes(x=Month,fill=Bank.Campaign$Month))+geom_bar()+labs(x="r",y="t")+ggtitle("maintitle=m")
+```
+
+
