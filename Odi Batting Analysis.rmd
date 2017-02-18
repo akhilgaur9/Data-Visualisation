@@ -1,0 +1,137 @@
+---
+title: "Assignment - 1"
+author: "Akhil Gaur"
+output: html_document
+---
+
+-----------------------------------------
+# Reading the ODI Batting Analysis File 
+
+
+```{r}
+odi <- read.csv("C:/Users/Admin/Desktop/odi-batting-analysis.csv", sep = ",")
+head(odi)
+```
+
+# Bar chart for total runs by month 
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+month_runs <- odi %>% group_by(Month) %>% summarise(TotalRuns = sum(Runs, na.rm = TRUE))
+month_runs$Month <- factor(month_runs$Month)
+ggplot(month_runs, aes(x = Month, y = TotalRuns,fill = -TotalRuns)) + geom_bar(stat = 'identity',color = "pink") +coord_flip() 
+```
+
+# Bar chart for total runs by day of week 
+
+
+```{r}
+weekday_runs <- odi %>% group_by(Dayofweek) %>% summarise(TotalRuns = sum(Runs, na.rm = TRUE))
+weekday_runs$Dayofweek <- factor(weekday_runs$Dayofweek)
+ggplot(weekday_runs, aes(x = Dayofweek, y = TotalRuns,fill = -TotalRuns)) + geom_bar(stat = 'identity',color = "brown")+coord_flip()
+```
+
+
+# Bar chart for total runs by day of month 
+
+
+```{r}
+day_month_run <- odi %>% group_by(Day) %>% summarise(TotalRuns = sum(Runs, na.rm = TRUE))
+day_month_run$Day = factor(day_month_run$Day)
+ggplot(day_month_run, aes(x = Day, y = TotalRuns,fill = -TotalRuns)) + geom_bar(stat = 'identity')+coord_flip()
+```
+
+----------------------------------------------------------------------------------------
+#2. Create a new column by binning the Runs column using the following ranges and plot the  frequency count of ranges
+# a. 0-25,
+# b. 26-50,
+# c. 51-75,
+# d. 76-100,
+# e. 100+ 
+-----------------------------------------------------------------------------------------
+```{r}
+odi <- na.omit(odi)
+odi$bin <- cut(odi$Runs, breaks = c(0,25,50,75,100,200), labels = c("0-25", "26-50", "51-75", "76-100", "100+"), include.lowest = TRUE)
+ggplot(odi, aes(x = bin)) + geom_bar(fill = "green")+coord_flip()
+```
+
+----------------------------------------------------------------------------------------
+#3. Top ten players by total runs 
+----------------------------------------------------------------------------------------
+
+```{r}
+players_summary <- odi %>% group_by(Player) %>% summarise(TotalRuns = sum(Runs, na.rm = TRUE))
+top10_players_summary <- head(players_summary %>% arrange(-TotalRuns), 10)
+top10_players_summary
+ggplot(top10_players_summary, aes(x = Player, y = TotalRuns, fill = -TotalRuns)) + geom_bar(stat = "identity") + coord_flip()
+```
+
+
+# Number of centuries across years 
+
+
+```{r}
+a<-odi %>% filter(odi$Player %in% top10_players_summary$Player,Runs >= 100)
+centuries_years <- a %>% group_by(Player,Year) %>% summarise(Centuries = n())
+ggplot(centuries_years, aes(x = Year, y = Centuries)) + geom_bar(stat = "identity", fill = "blue")+facet_wrap(~Player)
+
+```
+
+# Number of ducks across years 
+
+
+```{r}
+b<- odi %>% filter(odi$Player %in% top10_players_summary$Player & Runs == 0)
+ducks_years <- b %>% group_by(Player,Year) %>% summarise(Ducks = n())
+ggplot(ducks_years, aes(x = Year, y = Ducks)) + geom_bar(stat = "identity",fill="red")+ facet_wrap(~Player)
+```
+
+----------------------------------------------------------------------------------------
+#4a. Calculating total number of runs by each player and then filter only for those players who have scored more than 5000 runs.
+----------------------------------------------------------------------------------------
+
+```{r}
+players_summary_total <- odi %>% group_by(Player) %>% summarise(TotalRuns = sum(Runs)) %>% arrange(TotalRuns)
+runs_5000 <- filter(players_summary_total, TotalRuns >= 5000)
+h<-head(runs_5000,10)
+ggplot(h,aes(x=Player,y=TotalRuns,fill = -TotalRuns)) + geom_bar(stat='identity')+coord_flip()
+
+```
+
+-----------------------------------------------------------------
+#4b. Filter only those players who have played more than 50 matches.
+-----------------------------------------------------------------
+
+```{r}
+players_summary_matches <- odi %>% group_by(Player) %>% summarise(TotalRuns = sum(Runs),count = n()) %>% arrange(TotalRuns)
+matches_50 <- filter(players_summary_matches, count > 50)
+h1<-head(matches_50,10)
+ggplot(h1,aes(x=Player,y=TotalRuns,fill = -TotalRuns)) + geom_bar(stat='identity')+coord_flip()
+
+```
+
+--------------------------------------------------------------------------------
+#5. Create a new column by computing the number of words in each palyers's name.
+--------------------------------------------------------------------------------
+
+```{r}
+odi$Player<-as.character(odi$Player)
+
+c<-strsplit(odi$Player," ")
+odi$Freqwords<-sapply(c,length)
+odi$Freqwords
+str(odi)
+
+```
+
+---------------------------------------------------------------------------------
+#6. Crosstab between month and day.
+---------------------------------------------------------------------------------
+
+```{r}
+x<-xtabs(~Month+Day,data=odi)
+ftable(x)
+
+```
